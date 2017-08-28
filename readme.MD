@@ -19,24 +19,26 @@ Usage
 -----
 
 - Copy ssdb_backend.py to your Celery project.
-- monkey patch the celery app's `backend_cls` where you create celery app
-
-```
-celery = Celery(app.__name__, broker='pyamqp://{}:{}@{}:{}/{}'.format(RM_USER, RM_PWD, RM_HOST, RM_PORT, RM_VHOST))
-celery.backend_cls = 'backend.ssdb.SSDBBackend'
-```
-
 - Add the following to `celery_settings.py`
 
 ```
+CELERY_RESULT_BACKEND = "backend.ssdb.SSDBBackend"
 CELERY_SSDB_BACKEND_SETTINGS = {
     "host": "127.0.0.1",
     "port": 8888,
     "password": "",
-    "expires": 0
+    "expires": None
 }
 CELERY_RESULT_SERIALIZER = 'json'
 ```
+
+- load config after you create celery app
+
+```
+celery = Celery(app.__name__)
+celery.config_from_object('celery_settings')
+```
+
 
 - Then start your app
 
